@@ -7,6 +7,6 @@
  */
 public class Harness {
     public static void main(String[] args) {
-        new AnimeSearch().searchById(2167);
+        new AnimeSearch().searchByQuery("busters");
     }
 }
