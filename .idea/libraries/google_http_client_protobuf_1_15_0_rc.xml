@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="google-http-client-protobuf-1.15.0-rc">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/google-http-java-client-1.15.0-rc/libs/google-http-client-protobuf-1.15.0-rc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
