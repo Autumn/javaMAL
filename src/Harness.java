@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
@@ -7,6 +9,7 @@
  */
 public class Harness {
     public static void main(String[] args) {
-        new AnimeSearch().searchByQuery("busters");
+        ArrayList<AnimeSearchResult> animeSearchResult = new AnimeSearch().searchByQuery("clannad");
+        System.out.println(animeSearchResult);
     }
 }

@@ -37,7 +37,7 @@ public class AnimeSearch {
                 Pattern p = Pattern.compile(pattern);
                 Matcher m = p.matcher(url);
                 if (m.find()) {
-                    anime.setId(Integer.getInteger(m.group(1).toString()));
+                    anime.setId(Integer.valueOf(m.group(1)));
                 }
 
                 Element imageNode = e.select("td a img").first();
@@ -49,15 +49,12 @@ public class AnimeSearch {
                 anime.setMembersScore(Float.valueOf(tableCellNodes.get(4).text()));
                 anime.setType(tableCellNodes.get(2).text());
 
-                // ISSUE - not detecting following elements with correct URL
-                //String startDate = tableCellNodes.get(5).text();
-                //String endDate = tableCellNodes.get(6).text();
-                //String classification = "";
-                //if (tableCellNodes.size() > 8) {
-                //    classification = tableCellNodes.get(8).text();
-                //}
-                //System.out.println(episodes.toString() + " " + membersScore.toString() + " " + type + " " + startDate + " " + endDate + " " + classification);
-
+                String startDate = tableCellNodes.get(5).text();
+                String endDate = tableCellNodes.get(6).text();
+                String classification = "";
+                if (tableCellNodes.size() > 8) {
+                    classification = tableCellNodes.get(8).text();
+                }
                 animeList.add(anime);
             }
         } catch (Exception e) {
@@ -72,8 +69,8 @@ public class AnimeSearch {
     }
 
     public ArrayList<AnimeSearchResult> searchByQuery(String query) {
-        String searchUrl = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=" + query;
-        return scrapeSearchResults(new Network().connect(searchUrl));
+        String searchQueryString = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=" + query;
+        return scrapeSearchResults(new Network().connect(searchQueryString));
     }
 
     public void searchById(int id) {

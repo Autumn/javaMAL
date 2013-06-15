@@ -93,4 +93,8 @@ public class AnimeSearchResult extends Anime {
     public void setMembersScore(Float membersScore) {
         this.membersScore = membersScore;
     }
+
+    public String toString() {
+        return getTitle() + " " + getId();
+    }
 }
