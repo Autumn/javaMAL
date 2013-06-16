@@ -1,5 +1,6 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 import java.util.ArrayList;
@@ -64,7 +65,114 @@ public class AnimeSearch {
     }
 
     private Anime scrapeAnime(String site) {
-        System.out.println(site);
+        AnimeResult anime = new AnimeResult();
+        try {
+            Document doc = Jsoup.parse(site);
+            Element animeIdInput = doc.select("input[name=aid]").get(0);
+            anime.setId(Integer.valueOf(animeIdInput.attr("value")));
+            anime.setTitle(doc.select("h1").get(0).ownText());
+            System.out.println(doc.select("h1 > div").text()); // Ranked #XX
+            System.out.println(doc.select("div#content tr td div img").attr("src")); // thumb url
+            Elements leftColumnNodeset = doc.select("div#content table tr td.borderClass");
+            //System.out.println(leftColumnNodeset);
+
+            Elements otherEnglishTitles = doc.select("span:containsOwn(English:)");
+            Elements otherJapaneseTitles = doc.select("span:containsOwn(Japanese:)");
+            Elements otherSynonymTitles = doc.select("span:containsOwn(Synonyms:)");
+            ArrayList<OtherTitles> otherTitles = new ArrayList<OtherTitles>();
+            otherTitles.add(new OtherTitles("english", textIfExists(otherEnglishTitles)));
+            otherTitles.add(new OtherTitles("japanese", textIfExists(otherJapaneseTitles)));
+            otherTitles.add(new OtherTitles("synonyms", textIfExists(otherSynonymTitles)));
+
+            Elements typeNodes = doc.select("span:containsOwn(Type:)");
+            System.out.println(textIfExists(typeNodes));
+
+            Elements episodesNodes = doc.select("span:containsOwn(Episodes:");
+            System.out.println(textIfExists(episodesNodes));
+
+            Elements statusNodes = doc.select("span:containsOwn(Status:)");
+            System.out.println(textIfExists(statusNodes));
+
+            Elements airedNodes = doc.select("span:containsOwn(Aired:)");
+            System.out.println(textIfExists(airedNodes));
+
+            Elements producersLinks = doc.select("span:containsOwn(Producers:").parents().get(0).select("a");
+            ArrayList<Producers> producers = new ArrayList<Producers>();
+            for (Element link : producersLinks) {
+                String url = link.attr("href");
+                Integer id = Integer.valueOf(url.split("=")[1]);
+                String name = link.text();
+                producers.add(new Producers(id, name));
+            }
+            System.out.println(producers);
+
+            Elements genresLinks = doc.select("span:containsOwn(Genres:)").parents().get(0).select("a");
+            ArrayList<Genres> genres = new ArrayList<Genres>();
+            for (Element link : genresLinks) {
+                String url = link.attr("href");
+                Integer id = Integer.valueOf(url.split("=")[1]);
+                String name = link.text();
+                genres.add(new Genres(id, name));
+            }
+
+            System.out.println(genres);
+
+            Elements classificationNodes = doc.select("span:containsOwn(Rating:)");
+            System.out.println(textIfExists(classificationNodes));
+
+            Elements scoreNodes = doc.select("span:containsOwn(Score:)");
+            System.out.println(textIfExists(scoreNodes));
+
+            Elements popularityNodes = doc.select("span:containsOwn(Popularity:)");
+            System.out.println(textIfExists(popularityNodes));
+
+            Elements membersNodes = doc.select("span:containsOwn(Members:)");
+            System.out.println(textIfExists(membersNodes));
+
+            Elements favouritesNodes = doc.select("span:containsOwn(Favorites:)");
+            System.out.println(textIfExists(favouritesNodes));
+
+            Elements popularTagsNodes = doc.select("h2:containsOwn(Popular Tags) + span").get(0).select("a");
+            ArrayList<String> popularTags = new ArrayList<String>();
+            for (Element link : popularTagsNodes) {
+                popularTags.add(link.text());
+            }
+            System.out.println(popularTags);
+
+            Element synopsisNode = doc.select("h2:containsOwn(Synopsis)").get(0);
+            StringBuilder sb = new StringBuilder();
+            Node synopsis = synopsisNode.nextSibling();
+
+            do {
+                sb.append(synopsis.toString());
+            } while ((synopsis = synopsis.nextSibling()) != null);
+            System.out.println(sb.toString());
+
+            Elements relatedAnimeNodes = doc.select("h2:containsOwn(Related Anime)");
+            Node relatedAnimeNode = relatedAnimeNodes.get(0).nextSibling();
+
+            while (!relatedAnimeNode.nodeName().equals("h2")) {
+                System.out.println(relatedAnimeNode);
+                relatedAnimeNode = relatedAnimeNode.nextSibling();
+            }
+
+            // type - Adaptation/Prequel/Sequel/Character/Spin-off/Summary/Alternative versions
+            // link and name
+            // ", " if more, <br /> if finished
+            // h2 when completely done
+
+
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+
+        return null;
+    }
+
+    private String textIfExists(Elements nodes) {
+        if (nodes.size() > 0) {
+            return nodes.parents().get(0).ownText();
+        }
         return null;
     }
 

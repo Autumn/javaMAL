@@ -10,9 +10,7 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.UriTemplate;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,9 +23,11 @@ public class Network {
         String siteUrl = rootUrl + query;
         String result = "";
         try {
+            File f = new File("Clannad");
             URL url = new URL(siteUrl);
             URLConnection urlc = url.openConnection();
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+//            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            BufferedReader buffer = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
             String str;
             while ((str = buffer.readLine()) != null) {
