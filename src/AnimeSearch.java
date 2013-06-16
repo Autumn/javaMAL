@@ -4,6 +4,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,123 @@ import java.util.regex.Pattern;
  */
 
 public class AnimeSearch {
+
+    class OtherTitles {
+        public String language;
+        public String title;
+        public OtherTitles(String language, String title) {
+            this.language = language;
+            this.title = title;
+        }
+
+        public String toString() {
+            return language + " " + title;
+        }
+    }
+
+    class Genres {
+        Integer id;
+        String name;
+        public Genres(Integer id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String toString() {
+            return id + " " + name;
+        }
+    }
+
+    class Producers {
+        Integer id;
+        String name;
+        public Producers(Integer id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        public String toString() {
+            return id + " " + name;
+        }
+    }
+
+    class RelatedAnime {
+        public Integer id;
+        public String title;
+        public String type;
+
+        public RelatedAnime(Integer id, String title, String type) {
+            this.id = id;
+            this.title = title;
+            this.type = type;
+        }
+
+        public String toString() {
+            return id.toString() + " " + title + " " + type;
+        }
+    }
+
+
+    class RelatedManga {
+        public Integer id;
+        public String title;
+        public String type;
+
+        public RelatedManga(Integer id, String title, String type) {
+            this.id = id;
+            this.title = title;
+            this.type = type;
+        }
+
+        public String toString() {
+            return id.toString() + " " + title + " " + type;
+        }
+    }
+
+    class AnimeSearchCharacter {
+        Integer id;
+        String name;
+        String role;
+        String thumbUrl;
+        String imageUrl;
+        AnimeSearchSeiyuu[] seiyuus;
+        public AnimeSearchCharacter(Integer id, String name, String role, String thumbUrl, String imageUrl, AnimeSearchSeiyuu[] seiyuus) {
+            this.id = id;
+            this.name = name;
+            this.role = role;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+            this.seiyuus = seiyuus;
+        }
+    }
+
+    class AnimeSearchSeiyuu {
+        Integer id;
+        String name;
+        String nation;
+        String thumbUrl;
+        String imageUrl;
+        public AnimeSearchSeiyuu(Integer id, String name, String nation, String thumbUrl, String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.nation = nation;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+        }
+    }
+
+    class AnimeSearchStaff {
+        Integer id;
+        String name;
+        String role;
+        String thumbUrl;
+        String imageUrl;
+        public AnimeSearchStaff(Integer id, String name, String role, String thumbUrl, String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.role = role;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+        }
+    }
 
     private ArrayList<AnimeSearchResult> scrapeSearchResults(String site) {
         ArrayList<AnimeSearchResult> animeList = new ArrayList<AnimeSearchResult>();
@@ -193,7 +311,6 @@ public class AnimeSearch {
             System.out.println(relatedAnime);
 
             String charactersLink = doc.select("a:containsOwn(More characters)").get(0).attr("href");
-            System.out.println(charactersLink);
             String charactersPage = new Network().connect_url(charactersLink);
             scrapeCharactersStaffPage(charactersPage);
         } catch (Exception e) {
@@ -202,51 +319,88 @@ public class AnimeSearch {
         return null;
     }
 
-    private String scrapeCharactersStaffPage(String body) {
+
+    class CharactersStaff {
+        AnimeSearchCharacter[] characters;
+        AnimeSearchStaff[] staff;
+        CharactersStaff(AnimeSearchCharacter[] characters, AnimeSearchStaff[] staff) {
+            this.characters = characters;
+            this.staff = staff;
+        }
+    }
+
+    private CharactersStaff scrapeCharactersStaffPage(String body) {
         Document doc = Jsoup.parse(body);
         Elements nodes = doc.select("h2:containsOwn(Characters & Voice Actors) + table").parents().get(0).select("table");
         Element parentDiv = doc.select("h2:containsOwn(Characters & Voice Actors)").parents().get(0);
         Element staffNode = nodes.get(nodes.size() - 1);
-        //System.out.println(nodes);
-
+        ArrayList<AnimeSearchCharacter> characterList = new ArrayList<AnimeSearchCharacter>();
+        ArrayList<AnimeSearchStaff> staffList = new ArrayList<AnimeSearchStaff>();
         for (Element node : nodes) {
             if (!node.equals(staffNode)) {
                 if (!node.parent().equals(parentDiv)) continue; // required so the nested tables are skipped
+                
                 Elements characterNodes = node.select("tr").get(0).select("td");
                 Element characterInfoNode = characterNodes.get(1);
                 Element characterImageNode = characterNodes.get(0);
-                System.out.println(characterInfoNode.select("a").get(0).attr("href"));
-                System.out.println(characterInfoNode.select("small").text());
-                System.out.println(characterInfoNode.select("a").get(0).ownText());
-                System.out.println(characterImageNode.select("a img").attr("src"));
-                System.out.println();
 
+                String charUrl = characterInfoNode.select("a").get(0).attr("href");
+                Integer charId = idFromUrl(charUrl);
+                String charRole = characterInfoNode.select("small").text();
+                String charName = characterInfoNode.select("a").get(0).ownText();
+                String charThumbUrl = characterImageNode.select("a img").attr("src");
+                String charImageUrl = imageUrlFromThumbUrl(charThumbUrl, 't');
+
+                ArrayList<AnimeSearchSeiyuu> seiyuuList = new ArrayList<AnimeSearchSeiyuu>();
                 for (Element seiyuuNode : node.select("table tr")) {
                     Elements infoNodes = seiyuuNode.select("td");
                     if (infoNodes.size() > 0) {
                         Element seiyuuInfoNode = infoNodes.get(0);
                         Element seiyuuImageNode = infoNodes.get(1);
-                        System.out.println(seiyuuInfoNode.select("a").attr("href"));
-                        System.out.println(seiyuuInfoNode.select("small").text());
-                        System.out.println(seiyuuInfoNode.select("a").text());
-                        System.out.println(seiyuuImageNode.select("a img").attr("src"));
-                        System.out.println();
-
+                        String seiyuuUrl = seiyuuInfoNode.select("a").attr("href");
+                        Integer seiyuuId = idFromUrl(seiyuuUrl);
+                        String seiyuuNation = seiyuuInfoNode.select("small").text();
+                        String seiyuuName = seiyuuInfoNode.select("a").text();
+                        String seiyuuThumbUrl = seiyuuImageNode.select("a img").attr("src");
+                        String seiyuuImageUrl = imageUrlFromThumbUrl(seiyuuThumbUrl, 'v');
+                        seiyuuList.add(new AnimeSearchSeiyuu(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
                     }
                 }
+                Object[] array = seiyuuList.toArray();
+                AnimeSearchSeiyuu[] seiyuuArray = Arrays.copyOf(array, array.length, AnimeSearchSeiyuu[].class);
+                characterList.add(new AnimeSearchCharacter(charId, charName, charRole, charThumbUrl, charImageUrl, seiyuuArray));
             } else {
                 for (Element row : node.select("tr")) {
                     Elements staffNodes = row.select("td");
-                    System.out.println(staffNodes.get(1).select("a").text());
-                    System.out.println(staffNodes.get(1).select("small").text());
-                    System.out.println(staffNodes.get(0).select("img").attr("src"));
-                    System.out.println(staffNodes.get(0).select("a").attr("href"));
-                    System.out.println();
+                    String staffUrl = staffNodes.get(0).select("a").attr("href");
+                    Integer staffId = idFromUrl(staffUrl);
+                    String staffThumbUrl = staffNodes.get(0).select("img").attr("src");
+                    String staffImageUrl = imageUrlFromThumbUrl(staffThumbUrl, 'v');
+                    String staffName = staffNodes.get(1).select("a").text();
+                    String staffRole = staffNodes.get(1).select("small").text();
+                    staffList.add(new AnimeSearchStaff(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
                 }
             }
         }
+        Object[] array = characterList.toArray();
+        AnimeSearchCharacter[] characterArray = Arrays.copyOf(array, array.length, AnimeSearchCharacter[].class);
+        array = staffList.toArray();
+        AnimeSearchStaff[] staffArray = Arrays.copyOf(array, array.length, AnimeSearchStaff[].class);
 
-        return null;
+        return new CharactersStaff(characterArray, staffArray);
+    }
+
+    private Integer idFromUrl(String url) {
+        String[] str = url.split("/");
+        return Integer.valueOf(str[str.length - 2]);
+    }
+
+    private String imageUrlFromThumbUrl(String thumbUrl, char thumbChar) {
+        int char_pos = thumbUrl.lastIndexOf(".");
+        if (thumbUrl.charAt(char_pos - 1) == thumbChar) {
+            return thumbUrl.substring(0, char_pos - 1) + thumbUrl.substring(char_pos, thumbUrl.length());
+        }
+        return thumbUrl;
     }
 
     private String textIfExists(Elements nodes) {
