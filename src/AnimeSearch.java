@@ -103,6 +103,9 @@ public class AnimeSearch {
             this.imageUrl = imageUrl;
             this.seiyuus = seiyuus;
         }
+        public String toString() {
+            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl + " " + seiyuus;
+        }
     }
 
     class AnimeSearchSeiyuu {
@@ -118,6 +121,10 @@ public class AnimeSearch {
             this.thumbUrl = thumbUrl;
             this.imageUrl = imageUrl;
         }
+        public String toString() {
+            return id.toString() + " " + name + " " + nation + " " + thumbUrl + " " + imageUrl;
+        }
+
     }
 
     class AnimeSearchStaff {
@@ -133,6 +140,10 @@ public class AnimeSearch {
             this.thumbUrl = thumbUrl;
             this.imageUrl = imageUrl;
         }
+        public String toString() {
+            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl;
+        }
+
     }
 
     private ArrayList<AnimeSearchResult> scrapeSearchResults(String site) {
@@ -278,32 +289,27 @@ public class AnimeSearch {
             ArrayList<RelatedAnime> relatedAnime = new ArrayList<RelatedAnime>();
             while (!relatedAnimeNode.nodeName().equals("h2")) {
                 String text = relatedAnimeNode.toString();
-                if (text.matches(".*Adaptation:.*")) {
-                    type = "Adaptation";
-                } else if (text.matches(".*Prequel:.*")) {
-                    type = "Prequel";
-                } else if (text.matches(".*Sequel:.*")) {
-                    type = "Sequel";
-                } else if (text.matches(".*Character.*")) {
-                    type = "Character";
-                } else if (text.matches(".*Spin-off.*")) {
-                    type = "Spin-off";
-                } else if (text.matches(".*Summary.*")) {
-                    type = "Summary";
-                } else if (text.matches(".*Alternative version:.*")) {
-                    type = "Alternative version";
-                } else if (text.matches(".*Alternative setting:.*")) {
-                    type = "Alternative setting";
-                } else if (!text.matches(".*<br.*") && !text.matches(".*,.*") && !text.matches(" ")) {
+
+                String typePattern = "(Adaptation)|(Prequel)|(Sequel)|(Character)|(Spin-off)|(Summary)|(Alternative version)|(Alternative setting)";
+                Pattern typePatternMatcher = Pattern.compile(typePattern);
+                Matcher matcher = typePatternMatcher.matcher(text);
+                if (matcher.find()) {
+                    for (int i = 1; i <= matcher.groupCount(); i++) {
+                        if (matcher.group(i) != null) {
+                            type = matcher.group(i);
+                            break;
+                        }
+                    }
+                } else if (relatedAnimeNode.nodeName().equals("a")) {
                     String title = relatedAnimeNode.childNode(0).toString();
                     Integer id = 0;
-                    String pattern = "http://myanimelist.net/(\\w+)/(\\d+)/?.*";
-                    Pattern p = Pattern.compile(pattern);
-                    Matcher m = p.matcher(relatedAnimeNode.attr("href").toString());
-                    if (m.find()) {
-                        id = Integer.valueOf(m.group(2));
+                    Pattern idPattern = Pattern.compile("http://myanimelist.net/(\\w+)/(\\d+)/?.*");
+                    matcher = idPattern.matcher(relatedAnimeNode.attr("href").toString());
+                    if (matcher.find()) {
+                        id = Integer.valueOf(matcher.group(2));
                     }
                     relatedAnime.add(new RelatedAnime(id, title, type));
+
                 }
                 relatedAnimeNode = relatedAnimeNode.nextSibling();
             }
@@ -312,9 +318,11 @@ public class AnimeSearch {
 
             String charactersLink = doc.select("a:containsOwn(More characters)").get(0).attr("href");
             String charactersPage = new Network().connect_url(charactersLink);
-            scrapeCharactersStaffPage(charactersPage);
+            CharactersStaff charactersStaff = scrapeCharactersStaffPage(charactersPage);
+            System.out.println(Arrays.toString(charactersStaff.characters));
+            System.out.println(Arrays.toString(charactersStaff.staff));
         } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+            e.printStackTrace();
         }
         return null;
     }
