@@ -151,6 +151,11 @@ public class AnimeSearch {
             Elements relatedAnimeNodes = doc.select("h2:containsOwn(Related Anime)");
             Node relatedAnimeNode = relatedAnimeNodes.get(0).nextSibling();
 
+            // type - Adaptation/Prequel/Sequel/Character/Spin-off/Summary/Alternative versions
+            // link and name
+            // ", " if more, <br /> if finished
+            // h2 when completely done
+
             String type = "";
             ArrayList<RelatedAnime> relatedAnime = new ArrayList<RelatedAnime>();
             while (!relatedAnimeNode.nodeName().equals("h2")) {
@@ -187,14 +192,58 @@ public class AnimeSearch {
 
             System.out.println(relatedAnime);
 
-            // type - Adaptation/Prequel/Sequel/Character/Spin-off/Summary/Alternative versions
-            // link and name
-            // ", " if more, <br /> if finished
-            // h2 when completely done
-
-
+            String charactersLink = doc.select("a:containsOwn(More characters)").get(0).attr("href");
+            System.out.println(charactersLink);
+            String charactersPage = new Network().connect_url(charactersLink);
+            scrapeCharactersStaffPage(charactersPage);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
+        }
+        return null;
+    }
+
+    private String scrapeCharactersStaffPage(String body) {
+        Document doc = Jsoup.parse(body);
+        Elements nodes = doc.select("h2:containsOwn(Characters & Voice Actors) + table").parents().get(0).select("table");
+        Element parentDiv = doc.select("h2:containsOwn(Characters & Voice Actors)").parents().get(0);
+        Element staffNode = nodes.get(nodes.size() - 1);
+        //System.out.println(nodes);
+
+        for (Element node : nodes) {
+            if (!node.equals(staffNode)) {
+                if (!node.parent().equals(parentDiv)) continue; // required so the nested tables are skipped
+                Elements characterNodes = node.select("tr").get(0).select("td");
+                Element characterInfoNode = characterNodes.get(1);
+                Element characterImageNode = characterNodes.get(0);
+                System.out.println(characterInfoNode.select("a").get(0).attr("href"));
+                System.out.println(characterInfoNode.select("small").text());
+                System.out.println(characterInfoNode.select("a").get(0).ownText());
+                System.out.println(characterImageNode.select("a img").attr("src"));
+                System.out.println();
+
+                for (Element seiyuuNode : node.select("table tr")) {
+                    Elements infoNodes = seiyuuNode.select("td");
+                    if (infoNodes.size() > 0) {
+                        Element seiyuuInfoNode = infoNodes.get(0);
+                        Element seiyuuImageNode = infoNodes.get(1);
+                        System.out.println(seiyuuInfoNode.select("a").attr("href"));
+                        System.out.println(seiyuuInfoNode.select("small").text());
+                        System.out.println(seiyuuInfoNode.select("a").text());
+                        System.out.println(seiyuuImageNode.select("a img").attr("src"));
+                        System.out.println();
+
+                    }
+                }
+            } else {
+                for (Element row : node.select("tr")) {
+                    Elements staffNodes = row.select("td");
+                    System.out.println(staffNodes.get(1).select("a").text());
+                    System.out.println(staffNodes.get(1).select("small").text());
+                    System.out.println(staffNodes.get(0).select("img").attr("src"));
+                    System.out.println(staffNodes.get(0).select("a").attr("href"));
+                    System.out.println();
+                }
+            }
         }
 
         return null;
@@ -214,6 +263,6 @@ public class AnimeSearch {
 
     public void searchById(int id) {
         String searchUrl = "anime/" + Integer.toString(id);
-        scrapeAnime(new Network().connect(searchUrl));
+        scrapeAnime(new Network().connect_test1(searchUrl));
     }
 }

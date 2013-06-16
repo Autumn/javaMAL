@@ -17,12 +17,17 @@ public class Network {
 
     public String connect(String query) {
         String siteUrl = rootUrl + query;
+        return connect_url(siteUrl);
+    }
+
+    public String connect_test1(String query) {
+        String siteUrl = rootUrl + query;
         String result = "";
         try {
-            File f = new File("Clannad");
             URL url = new URL(siteUrl);
+            File f = new File("Clannad");
             URLConnection urlc = url.openConnection();
-//            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
             BufferedReader buffer = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
             String str;
@@ -35,5 +40,28 @@ public class Network {
             System.out.println(e.fillInStackTrace());
         }
         return result;
+    }
+
+
+    public String connect_url(String uri) {
+        String result = "";
+        try {
+            URL url = new URL(uri);
+            File f = new File("clannad_characters");
+            URLConnection urlc = url.openConnection();
+            //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            BufferedReader buffer = new BufferedReader(new FileReader(f));
+            StringBuilder sb = new StringBuilder();
+            String str;
+            while ((str = buffer.readLine()) != null) {
+                sb.append(str);
+            }
+            result = sb.toString();
+
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+        return result;
+
     }
 }
