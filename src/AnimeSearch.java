@@ -151,10 +151,41 @@ public class AnimeSearch {
             Elements relatedAnimeNodes = doc.select("h2:containsOwn(Related Anime)");
             Node relatedAnimeNode = relatedAnimeNodes.get(0).nextSibling();
 
+            String type = "";
+            ArrayList<RelatedAnime> relatedAnime = new ArrayList<RelatedAnime>();
             while (!relatedAnimeNode.nodeName().equals("h2")) {
-                System.out.println(relatedAnimeNode);
+                String text = relatedAnimeNode.toString();
+                if (text.matches(".*Adaptation:.*")) {
+                    type = "Adaptation";
+                } else if (text.matches(".*Prequel:.*")) {
+                    type = "Prequel";
+                } else if (text.matches(".*Sequel:.*")) {
+                    type = "Sequel";
+                } else if (text.matches(".*Character.*")) {
+                    type = "Character";
+                } else if (text.matches(".*Spin-off.*")) {
+                    type = "Spin-off";
+                } else if (text.matches(".*Summary.*")) {
+                    type = "Summary";
+                } else if (text.matches(".*Alternative version:.*")) {
+                    type = "Alternative version";
+                } else if (text.matches(".*Alternative setting:.*")) {
+                    type = "Alternative setting";
+                } else if (!text.matches(".*<br.*") && !text.matches(".*,.*") && !text.matches(" ")) {
+                    String title = relatedAnimeNode.childNode(0).toString();
+                    Integer id = 0;
+                    String pattern = "http://myanimelist.net/(\\w+)/(\\d+)/?.*";
+                    Pattern p = Pattern.compile(pattern);
+                    Matcher m = p.matcher(relatedAnimeNode.attr("href").toString());
+                    if (m.find()) {
+                        id = Integer.valueOf(m.group(2));
+                    }
+                    relatedAnime.add(new RelatedAnime(id, title, type));
+                }
                 relatedAnimeNode = relatedAnimeNode.nextSibling();
             }
+
+            System.out.println(relatedAnime);
 
             // type - Adaptation/Prequel/Sequel/Character/Spin-off/Summary/Alternative versions
             // link and name

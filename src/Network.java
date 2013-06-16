@@ -6,10 +6,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-import com.google.api.client.http.*;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.http.UriTemplate;
-
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
