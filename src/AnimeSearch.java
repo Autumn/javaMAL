@@ -37,19 +37,17 @@ public class AnimeSearch {
     
     String baseQuery = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=";
     
-    int final SORT_NONE = 0;
-    int final SORT_SCORE_DESCENDING = 1;
-    int final SORT_SCORE_ASCENDING = 2;
-    int final SORT_START_DATE_ASCENDING = 3;
-    int final SORT_START_DATE_DESCENDING = 4;
-    int final SORT_END_DATE_DESCENDING = 5;
-    int final SORT_END_DATE_ASCENDING = 6;
-    int final SORT_TYPE_DESCENDING = 7;
-    int final SORT_TYPE_ASCENDING = 8;
+    public final int  SORT_NONE = 0;
+    public final int  SORT_SCORE_DESCENDING = 1;
+    public final int SORT_SCORE_ASCENDING = 2;
+    public final int SORT_START_DATE_ASCENDING = 3;
+    public final int SORT_START_DATE_DESCENDING = 4;
+    public final int SORT_END_DATE_DESCENDING = 5;
+    public final int SORT_END_DATE_ASCENDING = 6;
+    public final int SORT_TYPE_DESCENDING = 7;
+    public final int SORT_TYPE_ASCENDING = 8;
     
-    String[] final sortTypes = {};
-    
-    String scoreDescendingQuery = {"", "o=3&w=1", "o=3&w=2", "o=2&w=1","o=2&w=2","o=5&w=2","o=5&w=1","o=6&w=1","o=6&w=2"};
+    String[] sortTypes = {"", "o=3&w=1", "o=3&w=2", "o=2&w=1","o=2&w=2","o=5&w=2","o=5&w=1","o=6&w=1","o=6&w=2"};;
     
     // TO DO - need to url encode query passed in
     
@@ -58,10 +56,9 @@ public class AnimeSearch {
     }
 
     public AnimeSearchResult[] searchByQuery(String query, int page) {
-        Integer pageQuery = 0;
         Integer pageQuery = page >= 1 ? (page - 1) * 20 : 0;
         String pageQueryString = "&show" + pageQuery.toString();
-        String searchQueryString = baseQuery + query + pageQueryString
+        String searchQueryString = baseQuery + query + pageQueryString;
         return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();
     }
     
