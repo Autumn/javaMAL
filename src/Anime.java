@@ -34,10 +34,9 @@ public abstract class Anime {
     protected Float score;
     protected String watchedStatus;
 
-
     protected Producers[] producers;
-    protected Characters[] characters;
-    protected People[] staff;
+    protected CharactersAnime[] characters;
+    protected StaffAnime[] staff;
 
     class OtherTitles {
         public String language;

@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class AnimeResult extends Anime {
 
-    public AnimeResult(String site) {
-        scrapeAnime(site);
+    public AnimeResult(String siteText) {
+        scrapeAnime(siteText);
     }
 
     private AnimeResult scrapeAnime(String site) {
@@ -150,90 +150,20 @@ public class AnimeResult extends Anime {
 
             String charactersLink = doc.select("a:containsOwn(More characters)").get(0).attr("href");
             String charactersPage = new Network().connect_url(charactersLink);
-            CharactersStaff charactersStaff = scrapeCharactersStaffPage(charactersPage);
-            System.out.println(Arrays.toString(charactersStaff.characters));
-            System.out.println(Arrays.toString(charactersStaff.staff));
+            scrapeCharactersStaffPage(charactersPage);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    class CharactersStaff {
-        AnimeSearchCharacter[] characters;
-        AnimeSearchStaff[] staff;
-        CharactersStaff(AnimeSearchCharacter[] characters, AnimeSearchStaff[] staff) {
-            this.characters = characters;
-            this.staff = staff;
-        }
-    }
-
-    class AnimeSearchCharacter {
-        Integer id;
-        String name;
-        String role;
-        String thumbUrl;
-        String imageUrl;
-        AnimeSearchSeiyuu[] seiyuus;
-        public AnimeSearchCharacter(Integer id, String name, String role, String thumbUrl, String imageUrl, AnimeSearchSeiyuu[] seiyuus) {
-            this.id = id;
-            this.name = name;
-            this.role = role;
-            this.thumbUrl = thumbUrl;
-            this.imageUrl = imageUrl;
-            this.seiyuus = seiyuus;
-        }
-        public String toString() {
-            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl + " " + seiyuus;
-        }
-    }
-
-    class AnimeSearchSeiyuu {
-        Integer id;
-        String name;
-        String nation;
-        String thumbUrl;
-        String imageUrl;
-        public AnimeSearchSeiyuu(Integer id, String name, String nation, String thumbUrl, String imageUrl) {
-            this.id = id;
-            this.name = name;
-            this.nation = nation;
-            this.thumbUrl = thumbUrl;
-            this.imageUrl = imageUrl;
-        }
-        public String toString() {
-            return id.toString() + " " + name + " " + nation + " " + thumbUrl + " " + imageUrl;
-        }
-
-    }
-
-    class AnimeSearchStaff {
-        Integer id;
-        String name;
-        String role;
-        String thumbUrl;
-        String imageUrl;
-        public AnimeSearchStaff(Integer id, String name, String role, String thumbUrl, String imageUrl) {
-            this.id = id;
-            this.name = name;
-            this.role = role;
-            this.thumbUrl = thumbUrl;
-            this.imageUrl = imageUrl;
-        }
-        public String toString() {
-            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl;
-        }
-
-    }
-
-
-    private CharactersStaff scrapeCharactersStaffPage(String body) {
+    private void scrapeCharactersStaffPage(String body) {
         Document doc = Jsoup.parse(body);
         Elements nodes = doc.select("h2:containsOwn(Characters & Voice Actors) + table").parents().get(0).select("table");
         Element parentDiv = doc.select("h2:containsOwn(Characters & Voice Actors)").parents().get(0);
         Element staffNode = nodes.get(nodes.size() - 1);
-        ArrayList<AnimeSearchCharacter> characterList = new ArrayList<AnimeSearchCharacter>();
-        ArrayList<AnimeSearchStaff> staffList = new ArrayList<AnimeSearchStaff>();
+        ArrayList<CharactersAnime> characterList = new ArrayList<CharactersAnime>();
+        ArrayList<StaffAnime> staffList = new ArrayList<StaffAnime>();
         for (Element node : nodes) {
             if (!node.equals(staffNode)) {
                 if (!node.parent().equals(parentDiv)) continue; // required so the nested tables are skipped
@@ -249,7 +179,7 @@ public class AnimeResult extends Anime {
                 String charThumbUrl = characterImageNode.select("a img").attr("src");
                 String charImageUrl = Utility.imageUrlFromThumbUrl(charThumbUrl, 't');
 
-                ArrayList<AnimeSearchSeiyuu> seiyuuList = new ArrayList<AnimeSearchSeiyuu>();
+                ArrayList<SeiyuuAnime> seiyuuList = new ArrayList<SeiyuuAnime>();
                 for (Element seiyuuNode : node.select("table tr")) {
                     Elements infoNodes = seiyuuNode.select("td");
                     if (infoNodes.size() > 0) {
@@ -261,12 +191,12 @@ public class AnimeResult extends Anime {
                         String seiyuuName = seiyuuInfoNode.select("a").text();
                         String seiyuuThumbUrl = seiyuuImageNode.select("a img").attr("src");
                         String seiyuuImageUrl = Utility.imageUrlFromThumbUrl(seiyuuThumbUrl, 'v');
-                        seiyuuList.add(new AnimeSearchSeiyuu(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
+                        seiyuuList.add(new SeiyuuAnime(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
                     }
                 }
                 Object[] array = seiyuuList.toArray();
-                AnimeSearchSeiyuu[] seiyuuArray = Arrays.copyOf(array, array.length, AnimeSearchSeiyuu[].class);
-                characterList.add(new AnimeSearchCharacter(charId, charName, charRole, charThumbUrl, charImageUrl, seiyuuArray));
+                SeiyuuAnime[] seiyuuArray = Arrays.copyOf(array, array.length, SeiyuuAnime[].class);
+                characterList.add(new CharactersAnime(charId, charName, charRole, charThumbUrl, charImageUrl, seiyuuArray));
             } else {
                 for (Element row : node.select("tr")) {
                     Elements staffNodes = row.select("td");
@@ -276,16 +206,17 @@ public class AnimeResult extends Anime {
                     String staffImageUrl = Utility.imageUrlFromThumbUrl(staffThumbUrl, 'v');
                     String staffName = staffNodes.get(1).select("a").text();
                     String staffRole = staffNodes.get(1).select("small").text();
-                    staffList.add(new AnimeSearchStaff(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
+                    staffList.add(new StaffAnime(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
                 }
             }
         }
         Object[] array = characterList.toArray();
-        AnimeSearchCharacter[] characterArray = Arrays.copyOf(array, array.length, AnimeSearchCharacter[].class);
+        CharactersAnime[] characterArray = Arrays.copyOf(array, array.length, CharactersAnime[].class);
         array = staffList.toArray();
-        AnimeSearchStaff[] staffArray = Arrays.copyOf(array, array.length, AnimeSearchStaff[].class);
+        StaffAnime[] staffArray = Arrays.copyOf(array, array.length, StaffAnime[].class);
+        setCharacters(characterArray);
+        setStaff(staffArray);
 
-        return new CharactersStaff(characterArray, staffArray);
     }
 
 
@@ -562,11 +493,11 @@ public class AnimeResult extends Anime {
         this.producers = producers;
     }
 
-    public Characters[] getCharacters() {
+    public CharactersAnime[] getCharacters() {
         return characters;
     }
 
-    public void setCharacters(Characters[] characters) {
+    public void setCharacters(CharactersAnime[] characters) {
         this.characters = characters;
     }
 
@@ -574,9 +505,16 @@ public class AnimeResult extends Anime {
         return staff;
     }
 
-    public void setStaff(People[] staff) {
+    public void setStaff(StaffAnime[] staff) {
         this.staff = staff;
     }
 
-
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId().toString() + "\n");
+        sb.append(getTitle() + "\n");
+        sb.append(getSynopsis() + "\n");
+        sb.append(Arrays.toString(getCharacters()) + "\n");
+        return sb.toString();
+    }
 }

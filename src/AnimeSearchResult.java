@@ -1,3 +1,12 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
@@ -6,6 +15,7 @@
  * To change this template use File | Settings | File Templates.
  */
 public class AnimeSearchResult extends Anime {
+
     public Integer getId() {
         return id;
     }
