@@ -59,10 +59,9 @@ public class AnimeSearch {
 
     public AnimeSearchResult[] searchByQuery(String query, int page) {
         Integer pageQuery = 0;
-        if (page >= 1) {
-            pageQuery = (page - 1) * 20;
-        }
-        String searchQueryString = baseQuery + query + "&show=" + pageQuery.toString();
+        Integer pageQuery = page >= 1 ? (page - 1) * 20 : 0;
+        String pageQueryString = "&show" + pageQuery.toString();
+        String searchQueryString = baseQuery + query + pageQueryString
         return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();
     }
     
@@ -71,11 +70,11 @@ public class AnimeSearch {
     }
     
     public AnimeSearchResult[] searchByQuerySort(String query, int page, int sortType) {
-        Integer pageQuery = 0;
-        if (page >= 1) {
-            pageQuery = (page - 1) * 20;
-        }
-        String searchQueryString = baseQuery + query + "&show=" + pageQuery.toString() + "&" + ;
+        Integer pageQuery = page >= 1 ? (page - 1) * 20 : 0;
+        sortType = sortType < 0 || sortType > 8 ? 0 : sortType;
+        String pageQueryString = "&show" + pageQuery.toString();
+        String sortQueryString = "&" + sortTypes[sortType];
+        String searchQueryString = baseQuery + query + pageQueryString + sortQueryString;
         return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();    
     }
     
