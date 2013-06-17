@@ -18,77 +18,8 @@ import java.util.regex.Pattern;
 
 public class AnimeSearch {
 
-    class OtherTitles {
-        public String language;
-        public String title;
-        public OtherTitles(String language, String title) {
-            this.language = language;
-            this.title = title;
-        }
 
-        public String toString() {
-            return language + " " + title;
-        }
-    }
-
-    class Genres {
-        Integer id;
-        String name;
-        public Genres(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-        public String toString() {
-            return id + " " + name;
-        }
-    }
-
-    class Producers {
-        Integer id;
-        String name;
-        public Producers(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-        public String toString() {
-            return id + " " + name;
-        }
-    }
-
-    class RelatedAnime {
-        public Integer id;
-        public String title;
-        public String type;
-
-        public RelatedAnime(Integer id, String title, String type) {
-            this.id = id;
-            this.title = title;
-            this.type = type;
-        }
-
-        public String toString() {
-            return id.toString() + " " + title + " " + type;
-        }
-    }
-
-
-    class RelatedManga {
-        public Integer id;
-        public String title;
-        public String type;
-
-        public RelatedManga(Integer id, String title, String type) {
-            this.id = id;
-            this.title = title;
-            this.type = type;
-        }
-
-        public String toString() {
-            return id.toString() + " " + title + " " + type;
-        }
-    }
-
-    class AnimeSearchCharacter {
+/*    class AnimeSearchCharacter {
         Integer id;
         String name;
         String role;
@@ -145,7 +76,7 @@ public class AnimeSearch {
         }
 
     }
-
+*/
     private ArrayList<AnimeSearchResult> scrapeSearchResults(String site) {
         ArrayList<AnimeSearchResult> animeList = new ArrayList<AnimeSearchResult>();
         try {
@@ -163,7 +94,7 @@ public class AnimeSearch {
 
                 Element urlNode = animeTitleNode.parents().first();
                 String url = urlNode.attr("href");
-                String pattern = "http://myanimelist.net/anime/(\\d+)/?.*";
+                String pattern = "http://myanimelist.net/(\\w+)/(\\d+)/?.*";
                 Pattern p = Pattern.compile(pattern);
                 Matcher m = p.matcher(url);
                 if (m.find()) {
@@ -172,7 +103,7 @@ public class AnimeSearch {
 
                 Element imageNode = e.select("td a img").first();
                 anime.setThumbUrl(imageNode.attr("src"));
-                //anime.setImageUrl(modified thumb url);
+                anime.setImageUrl(Utility.imageUrlFromThumbUrl(anime.getThumbUrl(), 't'));
 
                 Elements tableCellNodes = e.select("td");
                 anime.setEpisodes(Integer.valueOf(tableCellNodes.get(3).text()));
@@ -192,7 +123,7 @@ public class AnimeSearch {
         }
         return animeList;
     }
-
+/*
     private Anime scrapeAnime(String site) {
         AnimeResult anime = new AnimeResult();
         try {
@@ -200,16 +131,16 @@ public class AnimeSearch {
             Element animeIdInput = doc.select("input[name=aid]").get(0);
             anime.setId(Integer.valueOf(animeIdInput.attr("value")));
             anime.setTitle(doc.select("h1").get(0).ownText());
-            System.out.println(doc.select("h1 > div").text()); // Ranked #XX
-            System.out.println(doc.select("div#content tr td div img").attr("src")); // thumb url
-            Elements leftColumnNodeset = doc.select("div#content table tr td.borderClass");
-            //System.out.println(leftColumnNodeset);
+            String rankText = doc.select("h1 > div").text();
+            anime.setRank(Integer.valueOf(rankText.replaceAll("\\D", "")));
+            anime.setThumbUrl(doc.select("div#content tr td div img").attr("src"));
+            anime.setImageUrl(imageUrlFromThumbUrl(anime.getThumbUrl(), 't'));
 
             Elements otherEnglishTitles = doc.select("span:containsOwn(English:)");
             Elements otherJapaneseTitles = doc.select("span:containsOwn(Japanese:)");
             Elements otherSynonymTitles = doc.select("span:containsOwn(Synonyms:)");
-            ArrayList<OtherTitles> otherTitles = new ArrayList<OtherTitles>();
-            otherTitles.add(new OtherTitles("english", textIfExists(otherEnglishTitles)));
+            ArrayList<AnimeResult.OtherTitles> otherTitles = new ArrayList<Anime.OtherTitles>();
+            otherTitles.add(anime.OtherTitles.class.new("english", textIfExists(otherEnglishTitles)));
             otherTitles.add(new OtherTitles("japanese", textIfExists(otherJapaneseTitles)));
             otherTitles.add(new OtherTitles("synonyms", textIfExists(otherSynonymTitles)));
 
@@ -327,7 +258,6 @@ public class AnimeSearch {
         return null;
     }
 
-
     class CharactersStaff {
         AnimeSearchCharacter[] characters;
         AnimeSearchStaff[] staff;
@@ -417,7 +347,7 @@ public class AnimeSearch {
         }
         return null;
     }
-
+*/
     public ArrayList<AnimeSearchResult> searchByQuery(String query) {
         String searchQueryString = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=" + query;
         return scrapeSearchResults(new Network().connect(searchQueryString));
@@ -425,6 +355,7 @@ public class AnimeSearch {
 
     public void searchById(int id) {
         String searchUrl = "anime/" + Integer.toString(id);
-        scrapeAnime(new Network().connect_test1(searchUrl));
+        AnimeResult anime = new AnimeResult(new Network().connect_test1(searchUrl));
+        //scrapeAnime(new Network().connect_test1(searchUrl));
     }
 }

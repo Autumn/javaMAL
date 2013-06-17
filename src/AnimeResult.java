@@ -1,4 +1,302 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AnimeResult extends Anime {
+
+    public AnimeResult(String site) {
+        scrapeAnime(site);
+    }
+
+    private AnimeResult scrapeAnime(String site) {
+        try {
+            Object[] objectArray;
+
+            Document doc = Jsoup.parse(site);
+            Element animeIdInput = doc.select("input[name=aid]").get(0);
+            setId(Integer.valueOf(animeIdInput.attr("value")));
+            setTitle(doc.select("h1").get(0).ownText());
+            String rankText = doc.select("h1 > div").text();
+            setRank(Integer.valueOf(rankText.replaceAll("\\D", "")));
+            setThumbUrl(doc.select("div#content tr td div img").attr("src"));
+            setImageUrl(Utility.imageUrlFromThumbUrl(getThumbUrl(), 't'));
+
+            Elements otherEnglishTitles = doc.select("span:containsOwn(English:)");
+            Elements otherJapaneseTitles = doc.select("span:containsOwn(Japanese:)");
+            Elements otherSynonymTitles = doc.select("span:containsOwn(Synonyms:)");
+            ArrayList<OtherTitles> otherTitles = new ArrayList<Anime.OtherTitles>();
+            otherTitles.add(new OtherTitles("english", textIfExists(otherEnglishTitles)));
+            otherTitles.add(new OtherTitles("japanese", textIfExists(otherJapaneseTitles)));
+            otherTitles.add(new OtherTitles("synonyms", textIfExists(otherSynonymTitles)));
+
+            objectArray = otherTitles.toArray();
+            setOtherTitles(Arrays.copyOf(objectArray, objectArray.length, OtherTitles[].class));
+
+            Elements typeNodes = doc.select("span:containsOwn(Type:)");
+            setType(textIfExists(typeNodes));
+
+            Elements episodesNodes = doc.select("span:containsOwn(Episodes:");
+            setEpisodes(Integer.valueOf(textIfExists(episodesNodes)));
+
+            Elements statusNodes = doc.select("span:containsOwn(Status:)");
+            setStatus(textIfExists(statusNodes));
+
+            // need to parse the date
+            Elements airedNodes = doc.select("span:containsOwn(Aired:)");
+            System.out.println(textIfExists(airedNodes));
+
+            Elements producersLinks = doc.select("span:containsOwn(Producers:").parents().get(0).select("a");
+            ArrayList<Producers> producers = new ArrayList<Producers>();
+            for (Element link : producersLinks) {
+                String url = link.attr("href");
+                Integer id = Integer.valueOf(url.split("=")[1]);
+                String name = link.text();
+                producers.add(new Producers(id, name));
+            }
+            objectArray = producers.toArray();
+            setProducers(Arrays.copyOf(objectArray, objectArray.length, Producers[].class));
+
+
+            Elements genresLinks = doc.select("span:containsOwn(Genres:)").parents().get(0).select("a");
+            ArrayList<Genres> genres = new ArrayList<Genres>();
+            for (Element link : genresLinks) {
+                String url = link.attr("href");
+                Integer id = Integer.valueOf(url.split("=")[1]);
+                String name = link.text();
+                genres.add(new Genres(id, name));
+            }
+
+            objectArray = genres.toArray();
+            setGenres(Arrays.copyOf(objectArray, objectArray.length, Genres[].class));
+
+            Elements classificationNodes = doc.select("span:containsOwn(Rating:)");
+            setClassification(textIfExists(classificationNodes));
+
+            Elements scoreNodes = doc.select("span:containsOwn(Score:)");
+            setScore(Float.valueOf(textIfExists(scoreNodes)));
+
+            Elements popularityNodes = doc.select("span:containsOwn(Popularity:)");
+            setPopularityRank(Integer.valueOf(textIfExists(popularityNodes).replaceAll("\\W", "")));
+
+            Elements membersNodes = doc.select("span:containsOwn(Members:)");
+            setMembersCount(Integer.valueOf(textIfExists(membersNodes).replaceAll(",", "")));
+
+            Elements favouritesNodes = doc.select("span:containsOwn(Favorites:)");
+            setFavouritedCount(Integer.valueOf(textIfExists(favouritesNodes).replaceAll(",", "")));
+
+            Elements popularTagsNodes = doc.select("h2:containsOwn(Popular Tags) + span").get(0).select("a");
+            ArrayList<String> popularTags = new ArrayList<String>();
+            for (Element link : popularTagsNodes) {
+                popularTags.add(link.text());
+            }
+            objectArray = popularTags.toArray();
+            setTags(Arrays.copyOf(objectArray, objectArray.length, String[].class));
+
+            Element synopsisNode = doc.select("h2:containsOwn(Synopsis)").get(0);
+            StringBuilder sb = new StringBuilder();
+            Node synopsis = synopsisNode.nextSibling();
+
+            do {
+                sb.append(synopsis.toString());
+            } while ((synopsis = synopsis.nextSibling()) != null);
+            setSynopsis(sb.toString());
+
+            Elements relatedAnimeNodes = doc.select("h2:containsOwn(Related Anime)");
+            Node relatedAnimeNode = relatedAnimeNodes.get(0).nextSibling();
+
+            // type - Adaptation/Prequel/Sequel/Character/Spin-off/Summary/Alternative versions
+            // link and name
+            // ", " if more, <br /> if finished
+            // h2 when completely done
+
+            String type = "";
+            ArrayList<RelatedWorks> relatedWorks = new ArrayList<RelatedWorks>();
+            while (!relatedAnimeNode.nodeName().equals("h2")) {
+                String text = relatedAnimeNode.toString();
+
+                String typePattern = "(Adaptation)|(Prequel)|(Sequel)|(Character)|(Spin-off)|(Summary)|(Alternative version)|(Alternative setting)";
+                Pattern typePatternMatcher = Pattern.compile(typePattern);
+                Matcher matcher = typePatternMatcher.matcher(text);
+                if (matcher.find()) {
+                    for (int i = 1; i <= matcher.groupCount(); i++) {
+                        if (matcher.group(i) != null) {
+                            type = matcher.group(i);
+                            break;
+                        }
+                    }
+                } else if (relatedAnimeNode.nodeName().equals("a")) {
+                    String title = relatedAnimeNode.childNode(0).toString();
+                    Integer id = 0;
+                    Pattern idPattern = Pattern.compile("http://myanimelist.net/(\\w+)/(\\d+)/?.*");
+                    matcher = idPattern.matcher(relatedAnimeNode.attr("href").toString());
+                    if (matcher.find()) {
+                        id = Integer.valueOf(matcher.group(2));
+                    }
+                    relatedWorks.add(new RelatedWorks(id, title, type));
+
+                }
+                relatedAnimeNode = relatedAnimeNode.nextSibling();
+            }
+            // TO DO - separate each type of related story into own variable
+            objectArray = relatedWorks.toArray();
+            setRelatedStories(Arrays.copyOf(objectArray, objectArray.length, RelatedWorks[].class));
+
+            String charactersLink = doc.select("a:containsOwn(More characters)").get(0).attr("href");
+            String charactersPage = new Network().connect_url(charactersLink);
+            CharactersStaff charactersStaff = scrapeCharactersStaffPage(charactersPage);
+            System.out.println(Arrays.toString(charactersStaff.characters));
+            System.out.println(Arrays.toString(charactersStaff.staff));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    class CharactersStaff {
+        AnimeSearchCharacter[] characters;
+        AnimeSearchStaff[] staff;
+        CharactersStaff(AnimeSearchCharacter[] characters, AnimeSearchStaff[] staff) {
+            this.characters = characters;
+            this.staff = staff;
+        }
+    }
+
+    class AnimeSearchCharacter {
+        Integer id;
+        String name;
+        String role;
+        String thumbUrl;
+        String imageUrl;
+        AnimeSearchSeiyuu[] seiyuus;
+        public AnimeSearchCharacter(Integer id, String name, String role, String thumbUrl, String imageUrl, AnimeSearchSeiyuu[] seiyuus) {
+            this.id = id;
+            this.name = name;
+            this.role = role;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+            this.seiyuus = seiyuus;
+        }
+        public String toString() {
+            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl + " " + seiyuus;
+        }
+    }
+
+    class AnimeSearchSeiyuu {
+        Integer id;
+        String name;
+        String nation;
+        String thumbUrl;
+        String imageUrl;
+        public AnimeSearchSeiyuu(Integer id, String name, String nation, String thumbUrl, String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.nation = nation;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+        }
+        public String toString() {
+            return id.toString() + " " + name + " " + nation + " " + thumbUrl + " " + imageUrl;
+        }
+
+    }
+
+    class AnimeSearchStaff {
+        Integer id;
+        String name;
+        String role;
+        String thumbUrl;
+        String imageUrl;
+        public AnimeSearchStaff(Integer id, String name, String role, String thumbUrl, String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.role = role;
+            this.thumbUrl = thumbUrl;
+            this.imageUrl = imageUrl;
+        }
+        public String toString() {
+            return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl;
+        }
+
+    }
+
+
+    private CharactersStaff scrapeCharactersStaffPage(String body) {
+        Document doc = Jsoup.parse(body);
+        Elements nodes = doc.select("h2:containsOwn(Characters & Voice Actors) + table").parents().get(0).select("table");
+        Element parentDiv = doc.select("h2:containsOwn(Characters & Voice Actors)").parents().get(0);
+        Element staffNode = nodes.get(nodes.size() - 1);
+        ArrayList<AnimeSearchCharacter> characterList = new ArrayList<AnimeSearchCharacter>();
+        ArrayList<AnimeSearchStaff> staffList = new ArrayList<AnimeSearchStaff>();
+        for (Element node : nodes) {
+            if (!node.equals(staffNode)) {
+                if (!node.parent().equals(parentDiv)) continue; // required so the nested tables are skipped
+
+                Elements characterNodes = node.select("tr").get(0).select("td");
+                Element characterInfoNode = characterNodes.get(1);
+                Element characterImageNode = characterNodes.get(0);
+
+                String charUrl = characterInfoNode.select("a").get(0).attr("href");
+                Integer charId = Utility.idFromUrl(charUrl);
+                String charRole = characterInfoNode.select("small").text();
+                String charName = characterInfoNode.select("a").get(0).ownText();
+                String charThumbUrl = characterImageNode.select("a img").attr("src");
+                String charImageUrl = Utility.imageUrlFromThumbUrl(charThumbUrl, 't');
+
+                ArrayList<AnimeSearchSeiyuu> seiyuuList = new ArrayList<AnimeSearchSeiyuu>();
+                for (Element seiyuuNode : node.select("table tr")) {
+                    Elements infoNodes = seiyuuNode.select("td");
+                    if (infoNodes.size() > 0) {
+                        Element seiyuuInfoNode = infoNodes.get(0);
+                        Element seiyuuImageNode = infoNodes.get(1);
+                        String seiyuuUrl = seiyuuInfoNode.select("a").attr("href");
+                        Integer seiyuuId = Utility.idFromUrl(seiyuuUrl);
+                        String seiyuuNation = seiyuuInfoNode.select("small").text();
+                        String seiyuuName = seiyuuInfoNode.select("a").text();
+                        String seiyuuThumbUrl = seiyuuImageNode.select("a img").attr("src");
+                        String seiyuuImageUrl = Utility.imageUrlFromThumbUrl(seiyuuThumbUrl, 'v');
+                        seiyuuList.add(new AnimeSearchSeiyuu(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
+                    }
+                }
+                Object[] array = seiyuuList.toArray();
+                AnimeSearchSeiyuu[] seiyuuArray = Arrays.copyOf(array, array.length, AnimeSearchSeiyuu[].class);
+                characterList.add(new AnimeSearchCharacter(charId, charName, charRole, charThumbUrl, charImageUrl, seiyuuArray));
+            } else {
+                for (Element row : node.select("tr")) {
+                    Elements staffNodes = row.select("td");
+                    String staffUrl = staffNodes.get(0).select("a").attr("href");
+                    Integer staffId = Utility.idFromUrl(staffUrl);
+                    String staffThumbUrl = staffNodes.get(0).select("img").attr("src");
+                    String staffImageUrl = Utility.imageUrlFromThumbUrl(staffThumbUrl, 'v');
+                    String staffName = staffNodes.get(1).select("a").text();
+                    String staffRole = staffNodes.get(1).select("small").text();
+                    staffList.add(new AnimeSearchStaff(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
+                }
+            }
+        }
+        Object[] array = characterList.toArray();
+        AnimeSearchCharacter[] characterArray = Arrays.copyOf(array, array.length, AnimeSearchCharacter[].class);
+        array = staffList.toArray();
+        AnimeSearchStaff[] staffArray = Arrays.copyOf(array, array.length, AnimeSearchStaff[].class);
+
+        return new CharactersStaff(characterArray, staffArray);
+    }
+
+
+    private String textIfExists(Elements nodes) {
+        if (nodes.size() > 0) {
+            return nodes.parents().get(0).ownText();
+        }
+        return null;
+    }
+
+
     public Integer getId() {
         return id;
     }
@@ -15,11 +313,11 @@ public class AnimeResult extends Anime {
         this.title = title;
     }
 
-    public String[] getOtherTitles() {
+    public OtherTitles[] getOtherTitles() {
         return otherTitles;
     }
 
-    public void setOtherTitles(String[] otherTitles) {
+    public void setOtherTitles(OtherTitles[] otherTitles) {
         this.otherTitles = otherTitles;
     }
 
@@ -103,11 +401,11 @@ public class AnimeResult extends Anime {
         this.endDate = endDate;
     }
 
-    public String[] getGenres() {
+    public Genres[] getGenres() {
         return genres;
     }
 
-    public void setGenres(String[] genres) {
+    public void setGenres(Genres[] genres) {
         this.genres = genres;
     }
 
@@ -150,6 +448,15 @@ public class AnimeResult extends Anime {
     public void setFavouritedCount(Integer favouritedCount) {
         this.favouritedCount = favouritedCount;
     }
+
+    public RelatedWorks[] getRelatedStories() {
+        return relatedWorks;
+    }
+
+    public void setRelatedStories(RelatedWorks[] relatedStories) {
+        this.relatedWorks = relatedStories;
+    }
+
 
     public String[] getMangaAdaptations() {
         return mangaAdaptations;
@@ -247,11 +554,11 @@ public class AnimeResult extends Anime {
         this.watchedStatus = watchedStatus;
     }
 
-    public String[] getProducers() {
+    public Producers[] getProducers() {
         return producers;
     }
 
-    public void setProducers(String[] producers) {
+    public void setProducers(Producers[] producers) {
         this.producers = producers;
     }
 
@@ -270,4 +577,6 @@ public class AnimeResult extends Anime {
     public void setStaff(People[] staff) {
         this.staff = staff;
     }
+
+
 }
