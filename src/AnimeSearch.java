@@ -34,9 +34,27 @@ types Music ONA Special Movie OVA
 
 */
 public class AnimeSearch {
+    
+    String baseQuery = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=";
+    
+    int final SORT_NONE = 0;
+    int final SORT_SCORE_DESCENDING = 1;
+    int final SORT_SCORE_ASCENDING = 2;
+    int final SORT_START_DATE_ASCENDING = 3;
+    int final SORT_START_DATE_DESCENDING = 4;
+    int final SORT_END_DATE_DESCENDING = 5;
+    int final SORT_END_DATE_ASCENDING = 6;
+    int final SORT_TYPE_DESCENDING = 7;
+    int final SORT_TYPE_ASCENDING = 8;
+    
+    String[] final sortTypes = {};
+    
+    String scoreDescendingQuery = {"", "o=3&w=1", "o=3&w=2", "o=2&w=1","o=2&w=2","o=5&w=2","o=5&w=1","o=6&w=1","o=6&w=2"};
+    
+    // TO DO - need to url encode query passed in
+    
     public AnimeSearchResult[] searchByQuery(String query) {
-        String searchQueryString = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=" + query;
-        return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();
+        return searchByQuery(query, 1);
     }
 
     public AnimeSearchResult[] searchByQuery(String query, int page) {
@@ -44,13 +62,25 @@ public class AnimeSearch {
         if (page >= 1) {
             pageQuery = (page - 1) * 20;
         }
-        String searchQueryString = "anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&show=" + pageQuery.toString() + "&q=" + query;
+        String searchQueryString = baseQuery + query + "&show=" + pageQuery.toString();
         return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();
     }
-
+    
+    public AnimeSearchResult[] searchByQuerySort(String query, int sortType) {
+        return searchByQuerySort(query, 1, sortType);    
+    }
+    
+    public AnimeSearchResult[] searchByQuerySort(String query, int page, int sortType) {
+        Integer pageQuery = 0;
+        if (page >= 1) {
+            pageQuery = (page - 1) * 20;
+        }
+        String searchQueryString = baseQuery + query + "&show=" + pageQuery.toString() + "&" + ;
+        return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();    
+    }
+    
     public AnimeResult searchById(int id) {
         String searchUrl = "anime/" + Integer.toString(id);
         return new AnimeResult(new Network().connect_test1(searchUrl));
-        //scrapeAnime(new Network().connect_test1(searchUrl));
     }
 }
