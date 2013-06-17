@@ -47,10 +47,10 @@ public class Network {
         String result = "";
         try {
             URL url = new URL(uri);
-            File f = new File("clannad_characters");
+            //File f = new File("clannad_characters");
             URLConnection urlc = url.openConnection();
-            //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
-            BufferedReader buffer = new BufferedReader(new FileReader(f));
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            //BufferedReader buffer = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
             String str;
             while ((str = buffer.readLine()) != null) {

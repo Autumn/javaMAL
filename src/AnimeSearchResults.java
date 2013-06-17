@@ -4,6 +4,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,7 @@ public class AnimeSearchResults {
                 Pattern p = Pattern.compile(pattern);
                 Matcher m = p.matcher(url);
                 if (m.find()) {
-                    anime.setId(Integer.valueOf(m.group(1)));
+                    anime.setId(Integer.valueOf(m.group(2)));
                 }
 
                 Element imageNode = e.select("td a img").first();
@@ -60,10 +61,20 @@ public class AnimeSearchResults {
                 anime.setImageUrl(Utility.imageUrlFromThumbUrl(anime.getThumbUrl(), 't'));
 
                 Elements tableCellNodes = e.select("td");
-                anime.setEpisodes(Integer.valueOf(tableCellNodes.get(3).text()));
-                anime.setMembersScore(Float.valueOf(tableCellNodes.get(4).text()));
+
+                String episodeCount = tableCellNodes.get(3).text();
+                if (!episodeCount.matches(".*-.*")) {
+                   anime.setEpisodes(Integer.valueOf(episodeCount));
+                }
+
+                String membersScore = tableCellNodes.get(4).text();
+                if (!membersScore.matches(".*-.*")) {
+                    anime.setMembersScore(Float.valueOf(membersScore));
+                }
                 anime.setType(tableCellNodes.get(2).text());
 
+                // TO DO - parse dates into date type
+                // dates may be hyphened
                 String startDate = tableCellNodes.get(5).text();
                 String endDate = tableCellNodes.get(6).text();
                 if (tableCellNodes.size() > 8) {
@@ -71,8 +82,10 @@ public class AnimeSearchResults {
                 }
                 animeList.add(anime);
             }
+            Object[] array = animeList.toArray();
+            searchResults = Arrays.copyOf(array, array.length, AnimeSearchResult[].class);
         } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+            e.printStackTrace();
         }
     }
 

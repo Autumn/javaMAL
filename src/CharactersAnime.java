@@ -23,7 +23,6 @@ public class CharactersAnime extends Characters {
         return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl + " " + Arrays.toString(seiyuus);
     }
 
-
     public Integer getId() {
         return id;
     }
