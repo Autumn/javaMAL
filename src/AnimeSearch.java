@@ -77,6 +77,6 @@ public class AnimeSearch {
     
     public AnimeResult searchById(int id) {
         String searchUrl = "anime/" + Integer.toString(id);
-        return new AnimeResult(new Network().connect_test1(searchUrl));
+        return new AnimeResult(new Network().connect(searchUrl));
     }
 }
