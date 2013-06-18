@@ -47,7 +47,7 @@ public class Network {
         String result = "";
         try {
             URL url = new URL(uri);
-            File f = new File("Kyou_Fujibayashi");
+            File f = new File("characterList.html");
             //URLConnection urlc = url.openConnection();
             //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
             BufferedReader buffer = new BufferedReader(new FileReader(f));
@@ -59,9 +59,8 @@ public class Network {
             result = sb.toString();
 
         } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+            e.printStackTrace();
         }
         return result;
-
     }
 }

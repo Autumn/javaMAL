@@ -11,4 +11,9 @@ public class CharacterSearch {
         return new CharacterResult(new Network().connect(searchUrl));
     }
 
+    public CharacterSearchResults searchByQuery(String query) {
+        String searchUrl = "character.php?q=" + query;
+        return new CharacterSearchResults(new Network().connect(searchUrl));
+    }
+
 }
