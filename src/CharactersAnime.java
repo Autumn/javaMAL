@@ -9,9 +9,9 @@ import java.util.Arrays;
  */
 public class CharactersAnime extends Characters {
     protected String role;
-    protected SeiyuuAnime[] seiyuus;
+    protected SeiyuuEmbedded[] seiyuus;
 
-    public CharactersAnime(Integer id, String name, String role, String thumbUrl, String imageUrl, SeiyuuAnime[] seiyuus) {
+    public CharactersAnime(Integer id, String name, String role, String thumbUrl, String imageUrl, SeiyuuEmbedded[] seiyuus) {
         this.id = id;
         this.name = name;
         this.role = role;
@@ -71,11 +71,11 @@ public class CharactersAnime extends Characters {
         this.role = role;
     }
 
-    public SeiyuuAnime[] getSeiyuus() {
+    public SeiyuuEmbedded[] getSeiyuus() {
         return seiyuus;
     }
 
-    public void setSeiyuus(SeiyuuAnime[] seiyuus) {
+    public void setSeiyuus(SeiyuuEmbedded[] seiyuus) {
         this.seiyuus = seiyuus;
     }
 }

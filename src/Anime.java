@@ -36,7 +36,7 @@ public abstract class Anime {
 
     protected Producers[] producers;
     protected CharactersAnime[] characters;
-    protected StaffAnime[] staff;
+    protected StaffEmbedded[] staff;
 
     class OtherTitles {
         public String language;

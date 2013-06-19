@@ -34,7 +34,7 @@ public class CharacterSearchResults {
             Element nameNode = cols.get(1);
             System.out.println(nameNode.select("a").attr("href"));
             System.out.println(nameNode.select("a").text());
-            //System.out.println(nameNode.select("small").text());
+            System.out.println(nameNode.select("small").text());
 
             Elements titlesNodes = cols.get(2).select("a");
             for (Element link : titlesNodes) {

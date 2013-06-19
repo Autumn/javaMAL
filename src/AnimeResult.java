@@ -163,7 +163,7 @@ public class AnimeResult extends Anime {
         Element parentDiv = doc.select("h2:containsOwn(Characters & Voice Actors)").parents().get(0);
         Element staffNode = nodes.get(nodes.size() - 1);
         ArrayList<CharactersAnime> characterList = new ArrayList<CharactersAnime>();
-        ArrayList<StaffAnime> staffList = new ArrayList<StaffAnime>();
+        ArrayList<StaffEmbedded> staffList = new ArrayList<StaffEmbedded>();
         for (Element node : nodes) {
             if (!node.equals(staffNode)) {
                 if (!node.parent().equals(parentDiv)) continue; // required so the nested tables are skipped
@@ -179,7 +179,7 @@ public class AnimeResult extends Anime {
                 String charThumbUrl = characterImageNode.select("a img").attr("src");
                 String charImageUrl = Utility.imageUrlFromThumbUrl(charThumbUrl, 't');
 
-                ArrayList<SeiyuuAnime> seiyuuList = new ArrayList<SeiyuuAnime>();
+                ArrayList<SeiyuuEmbedded> seiyuuList = new ArrayList<SeiyuuEmbedded>();
                 for (Element seiyuuNode : node.select("table tr")) {
                     Elements infoNodes = seiyuuNode.select("td");
                     if (infoNodes.size() > 0) {
@@ -191,11 +191,11 @@ public class AnimeResult extends Anime {
                         String seiyuuName = seiyuuInfoNode.select("a").text();
                         String seiyuuThumbUrl = seiyuuImageNode.select("a img").attr("src");
                         String seiyuuImageUrl = Utility.imageUrlFromThumbUrl(seiyuuThumbUrl, 'v');
-                        seiyuuList.add(new SeiyuuAnime(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
+                        seiyuuList.add(new SeiyuuEmbedded(seiyuuId, seiyuuName, seiyuuNation, seiyuuThumbUrl, seiyuuImageUrl));
                     }
                 }
                 Object[] array = seiyuuList.toArray();
-                SeiyuuAnime[] seiyuuArray = Arrays.copyOf(array, array.length, SeiyuuAnime[].class);
+                SeiyuuEmbedded[] seiyuuArray = Arrays.copyOf(array, array.length, SeiyuuEmbedded[].class);
                 characterList.add(new CharactersAnime(charId, charName, charRole, charThumbUrl, charImageUrl, seiyuuArray));
             } else {
                 for (Element row : node.select("tr")) {
@@ -206,14 +206,14 @@ public class AnimeResult extends Anime {
                     String staffImageUrl = Utility.imageUrlFromThumbUrl(staffThumbUrl, 'v');
                     String staffName = staffNodes.get(1).select("a").text();
                     String staffRole = staffNodes.get(1).select("small").text();
-                    staffList.add(new StaffAnime(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
+                    staffList.add(new StaffEmbedded(staffId, staffName, staffRole, staffThumbUrl, staffImageUrl));
                 }
             }
         }
         Object[] array = characterList.toArray();
         CharactersAnime[] characterArray = Arrays.copyOf(array, array.length, CharactersAnime[].class);
         array = staffList.toArray();
-        StaffAnime[] staffArray = Arrays.copyOf(array, array.length, StaffAnime[].class);
+        StaffEmbedded[] staffArray = Arrays.copyOf(array, array.length, StaffEmbedded[].class);
         setCharacters(characterArray);
         setStaff(staffArray);
 
@@ -505,7 +505,7 @@ public class AnimeResult extends Anime {
         return staff;
     }
 
-    public void setStaff(StaffAnime[] staff) {
+    public void setStaff(StaffEmbedded[] staff) {
         this.staff = staff;
     }
 

@@ -2,21 +2,21 @@
  * Created with IntelliJ IDEA.
  * User: aki
  * Date: 17/06/13
- * Time: 10:52 AM
+ * Time: 10:54 AM
  * To change this template use File | Settings | File Templates.
  */
-public class SeiyuuAnime extends People {
-    protected String nation;
+public class StaffEmbedded extends People {
+    protected String role;
 
-    public SeiyuuAnime(Integer id, String name, String nation, String thumbUrl, String imageUrl) {
+    public StaffEmbedded(Integer id, String name, String role, String thumbUrl, String imageUrl) {
         this.id = id;
         this.name = name;
-        this.nation = nation;
+        this.role = role;
         this.thumbUrl = thumbUrl;
         this.imageUrl = imageUrl;
     }
     public String toString() {
-        return id.toString() + " " + name + " " + nation + " " + thumbUrl + " " + imageUrl;
+        return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl;
     }
 
 
@@ -36,12 +36,12 @@ public class SeiyuuAnime extends People {
         this.name = name;
     }
 
-    public String getNation() {
-        return nation;
+    public String getRole() {
+        return role;
     }
 
-    public void setNation(String nation) {
-        this.nation = nation;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getImageUrl() {
