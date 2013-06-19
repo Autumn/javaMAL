@@ -4,6 +4,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +17,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class CharacterSearchResults {
-    protected CharacterSearchResults searchResults;
+    protected CharacterSearchResult[] searchResults;
     public CharacterSearchResults(String siteText) {
         scrapeSearchResults(siteText);
     }
@@ -24,32 +26,42 @@ public class CharacterSearchResults {
         Document doc = Jsoup.parse(siteText);
         Elements rows = doc.select("table").get(1).select("tr");
         rows.remove(0);
+        ArrayList<CharacterSearchResult> characterList = new ArrayList<CharacterSearchResult>();
         for (Element row : rows) {
             Elements cols = row.select("td");
 
             Element imageNode = cols.get(0);
-            System.out.println(imageNode.select("a").attr("href"));
-            System.out.println(imageNode.select("img").attr("src"));
+            CharacterSearchResult character = new CharacterSearchResult();
+            character.setId(Utility.idFromUrl(imageNode.select("a").attr("href")));
+            character.setThumbUrl(imageNode.select("img").attr("src"));
+            character.setImageUrl(Utility.imageUrlFromThumbUrl(character.getThumbUrl(), 't'));
 
             Element nameNode = cols.get(1);
-            System.out.println(nameNode.select("a").attr("href"));
-            System.out.println(nameNode.select("a").text());
-            System.out.println(nameNode.select("small").text());
+            character.setName(nameNode.select("a").text());
+            character.setRole(nameNode.select("small").text());
 
             Elements titlesNodes = cols.get(2).select("a");
+            ArrayList<AnimeEmbedded> animeList = new ArrayList<AnimeEmbedded>();
+            ArrayList<MangaEmbedded> mangaList = new ArrayList<MangaEmbedded>();
             for (Element link : titlesNodes) {
                 Pattern animePattern = Pattern.compile("http://myanimelist.net/anime/(\\d+)/.*");
                 Pattern mangaPattern = Pattern.compile("http://myanimelist.net/manga/(\\d+)/.*");
                 Matcher animeMatch = animePattern.matcher(link.attr("href"));
                 Matcher mangaMatch = mangaPattern.matcher(link.attr("href"));
                 if (animeMatch.find()) {
-                    System.out.println("anime " + link.attr("href") + " " + link.text());
+                    animeList.add(new AnimeEmbedded(Utility.idFromUrl(link.attr("href")), link.text(), null, null, null));
                 } else if (mangaMatch.find()) {
-                    System.out.println("manga " + link.attr("href") + " " + link.text());
+                    mangaList.add(new MangaEmbedded(Utility.idFromUrl(link.attr("href")), link.text(), null, null, null));
                 }
             }
-            System.out.println();
-        }
+            Object[] objectArray = animeList.toArray();
+            character.setAnime(Arrays.copyOf(objectArray, objectArray.length, AnimeEmbedded[].class));
 
+            objectArray = mangaList.toArray();
+            character.setManga(Arrays.copyOf(objectArray, objectArray.length, MangaEmbedded[].class));
+            characterList.add(character);
+        }
+        Object[] objectArray = characterList.toArray();
+        searchResults = Arrays.copyOf(objectArray, objectArray.length, CharacterSearchResult[].class);
     }
 }
