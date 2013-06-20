@@ -47,7 +47,7 @@ public class Network {
         String result = "";
         try {
             URL url = new URL(uri);
-            File f = new File("characterList.html");
+            File f = new File("kana");
             //URLConnection urlc = url.openConnection();
             //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
             BufferedReader buffer = new BufferedReader(new FileReader(f));
