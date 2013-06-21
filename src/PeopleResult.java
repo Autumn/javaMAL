@@ -146,7 +146,7 @@ public class PeopleResult extends People {
             }
         }
 
-        array = animeStaffRoleList.toArray();
+        array = mangaStaffRoleList.toArray();
         setMangaStaffRoles(Arrays.copyOf(array, array.length, MangaStaffRole[].class));
 
     }
