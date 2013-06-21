@@ -5,6 +5,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,6 +15,22 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class PeopleResult extends People {
+
+    protected Integer id;
+    protected String name;
+    protected String imageUrl;
+
+    protected String givenName;
+    protected String familyName;
+
+    protected String birthday;
+    protected String websiteUrl;
+    protected String more;
+
+    protected VoiceActingRole[] seiyuuRoles;
+    protected AnimeStaffRole[] animeStaffRoles;
+    protected MangaStaffRole[] mangaStaffRoles;
+
     public PeopleResult(String siteText) {
         scrapePerson(siteText);
     }
@@ -21,30 +38,30 @@ public class PeopleResult extends People {
     private void scrapePerson(String siteText) {
         Document doc = Jsoup.parse(siteText);
         Element detailsLink = doc.select("a:containsOwn(Details)").get(0);
-        System.out.println(Utility.idFromUrl(detailsLink.attr("href")));
+        setId(Utility.idFromUrl(detailsLink.attr("href")));
         Elements allContent = doc.select("div#contentWrapper");
-        System.out.println(doc.select("h1").get(0).text()); // name
+        setName(doc.select("h1").get(0).text()); // name
         Element content = allContent.select("div#content").get(0);
-        System.out.println(content.select("img").attr("src")); // image url
+        setImageUrl(content.select("img").attr("src")); // image url
 
         Elements givenNameNode = content.select("span:containsOwn(Given name:)");
         if (givenNameNode.size() > 0) {
-            System.out.println(givenNameNode.get(0).nextSibling().toString().trim());
+            setGivenName(givenNameNode.get(0).nextSibling().toString().trim());
         }
 
         Elements familyNameNode = content.select("span:containsOwn(Family name:)");
         if (familyNameNode.size() > 0) {
-            System.out.println(familyNameNode.get(0).nextSibling().toString().trim());
+            setFamilyName(familyNameNode.get(0).nextSibling().toString().trim());
         }
 
         Elements birthdayNode = content.select("span:containsOwn(Birthday:)");
         if (birthdayNode.size() > 0) {
-            System.out.println(birthdayNode.get(0).nextSibling().toString().trim());
+            setBirthday(birthdayNode.get(0).nextSibling().toString().trim());
         }
 
         Elements websiteNode = content.select("span:containsOwn(Website:)");
         if (websiteNode.size() > 0) {
-            System.out.println(websiteNode.get(0).nextSibling().nextSibling().attr("href"));
+            setWebsiteUrl(websiteNode.get(0).nextSibling().nextSibling().attr("href"));
         }
 
         Node moreNode = content.select("span:containsOwn(More:)").parents().get(0).nextSibling();
@@ -57,7 +74,7 @@ public class PeopleResult extends People {
             }
             moreNode = moreNode.nextSibling();
         }
-        System.out.println(moreText.toString());
+        setMore(moreText.toString());
 
         Elements seiyuuListNodes = content.select("div:containsOwn(Voice Acting Roles)");
         ArrayList<VoiceActingRole> seiyuuRoles = new ArrayList<VoiceActingRole>();
@@ -85,6 +102,9 @@ public class PeopleResult extends People {
             }
         }
 
+        Object[] array = seiyuuRoles.toArray();
+        setSeiyuuRoles(Arrays.copyOf(array, array.length, VoiceActingRole[].class));
+
         Elements animeStaffRolesNodes = content.select("div:containsOwn(Anime Staff Positions)");
         ArrayList<AnimeStaffRole> animeStaffRoleList = new ArrayList<AnimeStaffRole>();
         if (!animeStaffRolesNodes.get(0).nextSibling().toString().matches(".*This person has not worked on any anime.*")) {
@@ -102,6 +122,10 @@ public class PeopleResult extends People {
                 animeStaffRoleList.add(new AnimeStaffRole(animeId, animeTitle, animeRole, animeThumbUrl, animeImageUrl));
             }
         }
+
+        array = animeStaffRoleList.toArray();
+        setAnimeStaffRoles(Arrays.copyOf(array, array.length, AnimeStaffRole[].class));
+
 
         Elements publishedMangaNodes = content.select("div:containsOwn(Published Manga)");
         ArrayList<MangaStaffRole> mangaStaffRoleList = new ArrayList<MangaStaffRole>();
@@ -122,5 +146,96 @@ public class PeopleResult extends People {
             }
         }
 
+        array = animeStaffRoleList.toArray();
+        setMangaStaffRoles(Arrays.copyOf(array, array.length, MangaStaffRole[].class));
+
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getGivenName() {
+        return givenName;
+    }
+
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
+    public String getFamilyName() {
+        return familyName;
+    }
+
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getWebsiteUrl() {
+        return websiteUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
+    public String getMore() {
+        return more;
+    }
+
+    public void setMore(String more) {
+        this.more = more;
+    }
+
+    public VoiceActingRole[] getSeiyuuRoles() {
+        return seiyuuRoles;
+    }
+
+    public void setSeiyuuRoles(VoiceActingRole[] seiyuuRoles) {
+        this.seiyuuRoles = seiyuuRoles;
+    }
+
+    public AnimeStaffRole[] getAnimeStaffRoles() {
+        return animeStaffRoles;
+    }
+
+    public void setAnimeStaffRoles(AnimeStaffRole[] animeStaffRoles) {
+        this.animeStaffRoles = animeStaffRoles;
+    }
+
+    public MangaStaffRole[] getMangaStaffRoles() {
+        return mangaStaffRoles;
+    }
+
+    public void setMangaStaffRoles(MangaStaffRole[] mangaStaffRoles) {
+        this.mangaStaffRoles = mangaStaffRoles;
     }
 }
