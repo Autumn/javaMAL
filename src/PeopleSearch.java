@@ -6,10 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 public class PeopleSearch {
-    public PeopleSearch searchById(int id) {
+    public PeopleResult searchById(int id) {
         String searchUrl = "people/" + Integer.toString(id);
         //return new CharacterResult(new Network().connect(searchUrl));
-        return null;
+        return new PeopleResult(new Network().connect(searchUrl));
     }
 
     public PeopleSearchResults searchByQuery(String query) {

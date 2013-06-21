@@ -1,3 +1,6 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
@@ -7,8 +10,12 @@
  */
 public class Utility {
     public static Integer idFromUrl(String url) {
-        String[] str = url.split("/");
-        return Integer.valueOf(str[str.length - 2]);
+        Pattern idPattern = Pattern.compile("http://myanimelist.net/(\\w+)/(\\d+)/?.*");
+        Matcher matcher = idPattern.matcher(url);
+        if (matcher.find()) {
+            return Integer.valueOf(matcher.group(2));
+        }
+        return 0;
     }
 
     public static String imageUrlFromThumbUrl(String thumbUrl, char thumbChar) {

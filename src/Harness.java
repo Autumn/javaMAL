@@ -12,6 +12,6 @@ public class Harness {
     public static void main(String[] args) {
         //System.out.println(new AnimeSearch().searchById(2167));
         //System.out.println(Arrays.toString(new AnimeSearch().searchByQuery("1", 2)));
-        new PeopleSearch().searchByQuery("kana");
+        new PeopleSearch().searchById(185);
     }
 }

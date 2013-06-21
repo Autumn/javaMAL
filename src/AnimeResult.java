@@ -15,7 +15,7 @@ public class AnimeResult extends Anime {
         scrapeAnime(siteText);
     }
 
-    private AnimeResult scrapeAnime(String site) {
+    private void scrapeAnime(String site) {
         try {
             Object[] objectArray;
 
@@ -154,7 +154,6 @@ public class AnimeResult extends Anime {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private void scrapeCharactersStaffPage(String body) {
@@ -216,7 +215,6 @@ public class AnimeResult extends Anime {
         StaffEmbedded[] staffArray = Arrays.copyOf(array, array.length, StaffEmbedded[].class);
         setCharacters(characterArray);
         setStaff(staffArray);
-
     }
 
 
