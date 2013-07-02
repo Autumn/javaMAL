@@ -1,12 +1,6 @@
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Node;
-import org.jsoup.select.Elements;
-import org.jsoup.nodes.Element;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+package uguu.gao.wafu.javaMAL;
+
+import java.net.URLEncoder;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,18 +44,23 @@ public class AnimeSearch {
     String[] sortTypes = {"", "o=3&w=1", "o=3&w=2", "o=2&w=1","o=2&w=2","o=5&w=2","o=5&w=1","o=6&w=1","o=6&w=2"};;
     
     // TO DO - need to url encode query passed in
-    
-    public AnimeSearchResult[] searchByQuery(String query) {
+
+    public AnimeSearchResults searchByQuery(String query) {
         return searchByQuery(query, 1);
     }
 
-    public AnimeSearchResult[] searchByQuery(String query, int page) {
+    public AnimeSearchResults searchByQuery(String query, int page) {
+        try {
+            query = URLEncoder.encode(query, "UTF-8");
+        } catch (Exception e) {}
+
         Integer pageQuery = page >= 1 ? (page - 1) * 20 : 0;
         String pageQueryString = "&show" + pageQuery.toString();
         String searchQueryString = baseQuery + query + pageQueryString;
-        return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();
+        return new AnimeSearchResults(new Network().connect(searchQueryString));
     }
-    
+
+    /*
     public AnimeSearchResult[] searchByQuerySort(String query, int sortType) {
         return searchByQuerySort(query, 1, sortType);    
     }
@@ -74,6 +73,7 @@ public class AnimeSearch {
         String searchQueryString = baseQuery + query + pageQueryString + sortQueryString;
         return new AnimeSearchResults(new Network().connect(searchQueryString)).getSearchResults();    
     }
+    */
     
     public AnimeResult searchById(int id) {
         String searchUrl = "anime/" + Integer.toString(id);

@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,6 +31,7 @@ public class AnimeSearchResults {
     protected AnimeSearchResult[] searchResults;
 
     public AnimeSearchResults(String siteText) {
+        searchResults = null;
         scrapeSearchResults(siteText);
     }
 
@@ -36,6 +39,11 @@ public class AnimeSearchResults {
         ArrayList<AnimeSearchResult> animeList = new ArrayList<AnimeSearchResult>();
         try {
             Document doc = Jsoup.parse(site);
+
+            if (doc.select("div:containsOwn(No titles that matched your query were found.)").size() == 1) {
+                return;
+            }
+
             Elements resultsTable = doc.select("div#content div:eq(1) table");
             Elements resultsRows = resultsTable.select("tr");
             for (Element e: resultsRows) {

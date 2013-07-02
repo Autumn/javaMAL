@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki

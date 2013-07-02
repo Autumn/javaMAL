@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,11 +19,17 @@ public class PeopleSearchResults {
 
     PeopleSearchResult[] searchResults;
     public PeopleSearchResults(String siteText) {
+        searchResults = null;
         scrapeSearchResults(siteText);
     }
 
     private void scrapeSearchResults(String siteText) {
         Document doc = Jsoup.parse(siteText);
+
+        if (doc.select("td:containsOwn(No results returned)").size() == 1) {
+            return;
+        }
+
         Elements rows = doc.select("table").get(1).select("tr");
         rows.remove(0);
         ArrayList<PeopleSearchResult> peopleList = new ArrayList<PeopleSearchResult>();

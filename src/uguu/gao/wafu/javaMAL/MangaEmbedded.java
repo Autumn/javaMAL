@@ -1,18 +1,10 @@
-/**
- * Created with IntelliJ IDEA.
- * User: aki
- * Date: 21/06/13
- * Time: 11:29 AM
- * To change this template use File | Settings | File Templates.
- */
-public class MangaStaffRole {
-    protected Integer id;
-    protected String title;
-    protected String role;
-    protected String thumbUrl;
-    protected String imageUrl;
+package uguu.gao.wafu.javaMAL;
 
-    public MangaStaffRole(Integer id, String title, String role, String thumbUrl, String imageUrl) {
+public class MangaEmbedded extends Manga {
+
+    protected String role;
+
+    public MangaEmbedded(Integer id, String title, String role, String thumbUrl, String imageUrl) {
         this.id = id;
         this.title = title;
         this.role = role;
@@ -59,5 +51,4 @@ public class MangaStaffRole {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
 }

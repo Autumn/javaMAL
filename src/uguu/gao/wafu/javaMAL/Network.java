@@ -1,4 +1,4 @@
-/**
+package uguu.gao.wafu.javaMAL; /**
  * Created with IntelliJ IDEA.
  * User: aki
  * Date: 14/06/13
@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 public class Network {
 
@@ -17,18 +18,20 @@ public class Network {
 
     public String connect(String query) {
         String siteUrl = rootUrl + query;
+
         return connect_url(siteUrl);
     }
-
+/*
     public String connect_test1(String query) {
-        String siteUrl = rootUrl + query;
         String result = "";
         try {
+            String siteUrl = rootUrl + URLEncoder.encode(query, "UTF-8");
+
             URL url = new URL(siteUrl);
-            File f = new File("Clannad");
+            //File f = new File("Clannad");
             URLConnection urlc = url.openConnection();
-            //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
-            BufferedReader buffer = new BufferedReader(new FileReader(f));
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            //BufferedReader buffer = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
             String str;
             while ((str = buffer.readLine()) != null) {
@@ -41,16 +44,16 @@ public class Network {
         }
         return result;
     }
-
+*/
 
     public String connect_url(String uri) {
         String result = "";
         try {
             URL url = new URL(uri);
-            File f = new File("Kana_Hanazawa");
-            //URLConnection urlc = url.openConnection();
-            //BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
-            BufferedReader buffer = new BufferedReader(new FileReader(f));
+            //File f = new File("Kana_Hanazawa");
+            URLConnection urlc = url.openConnection();
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            //BufferedReader buffer = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
             String str;
             while ((str = buffer.readLine()) != null) {

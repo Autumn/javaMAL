@@ -1,3 +1,7 @@
+package uguu.gao.wafu.javaMAL;
+
+import java.net.URLEncoder;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
@@ -12,6 +16,10 @@ public class CharacterSearch {
     }
 
     public CharacterSearchResults searchByQuery(String query) {
+        try {
+            query = URLEncoder.encode(query, "UTF-8");
+        } catch (Exception e) {}
+
         String searchUrl = "character.php?q=" + query;
         return new CharacterSearchResults(new Network().connect(searchUrl));
     }

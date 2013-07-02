@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -7,13 +9,6 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * Created with IntelliJ IDEA.
- * User: aki
- * Date: 21/06/13
- * Time: 10:21 AM
- * To change this template use File | Settings | File Templates.
- */
 public class PeopleResult extends People {
 
     protected Integer id;
@@ -130,7 +125,7 @@ public class PeopleResult extends People {
         Elements publishedMangaNodes = content.select("div:containsOwn(Published Manga)");
         ArrayList<MangaStaffRole> mangaStaffRoleList = new ArrayList<MangaStaffRole>();
 
-        if (!animeStaffRolesNodes.get(0).nextSibling().toString().matches(".*This person has not published any manga.*")) {
+        if (!publishedMangaNodes.get(0).nextSibling().toString().matches(".*This person has not published any manga.*")) {
             Element table = animeStaffRolesNodes.get(0).nextElementSibling();
             for (Element rows : table.select("tr")) {
                 Elements nodes = rows.select("td");

@@ -1,15 +1,20 @@
+package uguu.gao.wafu.javaMAL;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
- * Date: 19/06/13
- * Time: 9:53 PM
+ * Date: 21/06/13
+ * Time: 11:29 AM
  * To change this template use File | Settings | File Templates.
  */
-public class AnimeEmbedded extends Anime {
-
+public class MangaStaffRole {
+    protected Integer id;
+    protected String title;
     protected String role;
+    protected String thumbUrl;
+    protected String imageUrl;
 
-    public AnimeEmbedded(Integer id, String title, String role, String thumbUrl, String imageUrl) {
+    public MangaStaffRole(Integer id, String title, String role, String thumbUrl, String imageUrl) {
         this.id = id;
         this.title = title;
         this.role = role;
@@ -56,4 +61,5 @@ public class AnimeEmbedded extends Anime {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
 }

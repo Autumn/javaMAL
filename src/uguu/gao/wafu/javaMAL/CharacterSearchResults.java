@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,11 +20,17 @@ import java.util.regex.Pattern;
 public class CharacterSearchResults {
     protected CharacterSearchResult[] searchResults;
     public CharacterSearchResults(String siteText) {
+        searchResults = null;
         scrapeSearchResults(siteText);
     }
 
     public void scrapeSearchResults(String siteText) {
         Document doc = Jsoup.parse(siteText);
+
+        if (doc.select("td:containsOwn(No results found)").size() == 1) {
+            return;
+        }
+
         Elements rows = doc.select("table").get(1).select("tr");
         rows.remove(0);
         ArrayList<CharacterSearchResult> characterList = new ArrayList<CharacterSearchResult>();

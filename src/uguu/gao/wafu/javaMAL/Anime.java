@@ -1,3 +1,4 @@
+package uguu.gao.wafu.javaMAL;
 
 public abstract class Anime {
     protected Integer id;

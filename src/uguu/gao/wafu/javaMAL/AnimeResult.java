@@ -1,3 +1,5 @@
+package uguu.gao.wafu.javaMAL;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

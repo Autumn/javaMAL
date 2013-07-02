@@ -1,27 +1,26 @@
-import java.util.Arrays;
+package uguu.gao.wafu.javaMAL;
 
 /**
  * Created with IntelliJ IDEA.
  * User: aki
  * Date: 17/06/13
- * Time: 10:49 AM
+ * Time: 10:54 AM
  * To change this template use File | Settings | File Templates.
  */
-public class CharactersAnime extends Characters {
+public class StaffEmbedded extends People {
     protected String role;
-    protected SeiyuuEmbedded[] seiyuus;
 
-    public CharactersAnime(Integer id, String name, String role, String thumbUrl, String imageUrl, SeiyuuEmbedded[] seiyuus) {
+    public StaffEmbedded(Integer id, String name, String role, String thumbUrl, String imageUrl) {
         this.id = id;
         this.name = name;
         this.role = role;
         this.thumbUrl = thumbUrl;
         this.imageUrl = imageUrl;
-        this.seiyuus = seiyuus;
     }
     public String toString() {
-        return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl + " " + Arrays.toString(seiyuus);
+        return id.toString() + " " + name + " " + role + " " + thumbUrl + " " + imageUrl;
     }
+
 
     public Integer getId() {
         return id;
@@ -39,6 +38,14 @@ public class CharactersAnime extends Characters {
         this.name = name;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -53,29 +60,5 @@ public class CharactersAnime extends Characters {
 
     public void setThumbUrl(String thumbUrl) {
         this.thumbUrl = thumbUrl;
-    }
-
-    public People[] getSeiyuu() {
-        return seiyuu;
-    }
-
-    public void setSeiyuu(People[] seiyuu) {
-        this.seiyuu = seiyuu;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public SeiyuuEmbedded[] getSeiyuus() {
-        return seiyuus;
-    }
-
-    public void setSeiyuus(SeiyuuEmbedded[] seiyuus) {
-        this.seiyuus = seiyuus;
     }
 }

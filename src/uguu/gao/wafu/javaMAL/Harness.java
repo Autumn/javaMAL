@@ -1,4 +1,5 @@
-import java.util.ArrayList;
+package uguu.gao.wafu.javaMAL;
+
 import java.util.Arrays;
 
 /**
@@ -11,7 +12,9 @@ import java.util.Arrays;
 public class Harness {
     public static void main(String[] args) {
         //System.out.println(new AnimeSearch().searchById(2167));
-        //System.out.println(Arrays.toString(new AnimeSearch().searchByQuery("1", 2)));
-        new PeopleSearch().searchById(185);
+        PeopleSearchResults searchResults = new PeopleSearch().searchByQuery("asdfasdf");
+        if (searchResults.searchResults == null) {
+            System.out.println("none found");
+        }
     }
 }

@@ -1,13 +1,26 @@
+package uguu.gao.wafu.javaMAL;
+
 /**
  * Created with IntelliJ IDEA.
  * User: aki
- * Date: 19/06/13
- * Time: 10:05 PM
+ * Date: 17/06/13
+ * Time: 10:52 AM
  * To change this template use File | Settings | File Templates.
  */
-public class CharacterSearchResult extends Characters {
+public class SeiyuuEmbedded extends People {
+    protected String nation;
 
-    public String role;
+    public SeiyuuEmbedded(Integer id, String name, String nation, String thumbUrl, String imageUrl) {
+        this.id = id;
+        this.name = name;
+        this.nation = nation;
+        this.thumbUrl = thumbUrl;
+        this.imageUrl = imageUrl;
+    }
+    public String toString() {
+        return id.toString() + " " + name + " " + nation + " " + thumbUrl + " " + imageUrl;
+    }
+
 
     public Integer getId() {
         return id;
@@ -25,14 +38,13 @@ public class CharacterSearchResult extends Characters {
         this.name = name;
     }
 
-    public String getRole() {
-        return role;
+    public String getNation() {
+        return nation;
     }
 
-    public void setRole(String role) {
-        this.name = role;
+    public void setNation(String nation) {
+        this.nation = nation;
     }
-
 
     public String getImageUrl() {
         return imageUrl;
@@ -49,22 +61,4 @@ public class CharacterSearchResult extends Characters {
     public void setThumbUrl(String thumbUrl) {
         this.thumbUrl = thumbUrl;
     }
-
-    public void setAnime(Anime[] anime) {
-        this.anime = anime;
-    }
-
-    public Anime[] getAnime() {
-        return anime;
-    }
-
-    public void setManga(Manga[] manga) {
-        this.manga = manga;
-    }
-
-    public Manga[] getManga() {
-        return manga;
-    }
-
-
 }
